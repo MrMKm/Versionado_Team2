@@ -1,2 +1,4 @@
 C:\Users\MrMKm\Desktop\TREE_AVL\Debug\TREE_AVL.exe
 C:\Users\MrMKm\Desktop\TREE_AVL\Debug\TREE_AVL.pdb
+C:\Users\MrMKm\Desktop\REPO_TREE_AVL\Debug\TREE_AVL.exe
+C:\Users\MrMKm\Desktop\REPO_TREE_AVL\Debug\TREE_AVL.pdb
