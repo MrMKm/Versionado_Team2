@@ -71,3 +71,6 @@ BTREE<T>::~BTREE()
 {
 	deleteAll();
 }
+
+///Implementacion
+//Nodo
