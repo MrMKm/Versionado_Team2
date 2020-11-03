@@ -116,3 +116,23 @@ T*& BTREE<T>::Node::getDataPtr()
 {
 	return dataPtr;
 }
+//Nodo setData
+template<class T>
+void BTREE<T>::Node::setDataPtr(Node*& p)
+{
+	dataPtr = p;
+}
+
+template<class T>
+void BTREE<T>::Node::setData(const T & e)
+{
+	if (dataPtr == nullptr) {
+		if ((dataPtr = new T(e)) == nullptr) {
+			throw NodeException("MEMORIA NO DISPONIBLE, setData");
+		}
+	}
+
+	else {
+		*dataPtr = e;
+	}
+}
