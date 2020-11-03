@@ -104,3 +104,15 @@ BTREE<T>::Node::~Node()
 {
 	delete dataPtr;
 }
+//Nodo getData
+template<class T>
+T& BTREE<T>::Node::getData()
+{
+	return *dataPtr;
+}
+
+template<class T>
+T*& BTREE<T>::Node::getDataPtr()
+{
+	return dataPtr;
+}
