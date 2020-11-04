@@ -107,6 +107,74 @@ BTREE<T>::Node::~Node()
 {
 	delete dataPtr;
 }
+//Nodo getData
+template<class T>
+T& BTREE<T>::Node::getData()
+{
+	return *dataPtr;
+}
+
+template<class T>
+T*& BTREE<T>::Node::getDataPtr()
+{
+	return dataPtr;
+}
+//Nodo setData
+template<class T>
+void BTREE<T>::Node::setDataPtr(Node*& p)
+{
+	dataPtr = p;
+}
+
+template<class T>
+void BTREE<T>::Node::setData(const T & e)
+{
+	if (dataPtr == nullptr) {
+		if ((dataPtr = new T(e)) == nullptr) {
+			throw NodeException("MEMORIA NO DISPONIBLE, setData");
+		}
+	}
+
+	else {
+		*dataPtr = e;
+	}
+}
+//area privada
+//insertar en el arbol método privado
+template<class T>
+void BTREE<T>::insertData(Node*& r, const T & e)
+{
+	if (r == nullptr) {
+		try {
+			if ((r = new Node(e)) == nullptr) //Vacio, inserta como hoja (esta balanceada)
+				throw Exception("MEMORIA NO DISPONIBLE, insertData");
+		}
+		catch (Node::NodeException ex) {
+			throw Exception(ex.what());
+		}
+
+		return;
+	}
+
+	//Inserta en un subarbol (recursivamente)
+	if (e < r->getData()) {
+		insertData(r->getLeft(), e);
+	}
+	else {
+		insertData(r->getRight(), e);
+	}
+
+	//Saliendo de la recursividad
+
+	doBalancing(r); //Revisa factor de equilibro y aplica, rotación si es necesario
+}
+//area pública
+//insertar en el arbol método público
+template<class T>
+void BTREE<T>::insertData(const T & e)
+{
+	insertData(root, e);
+=======
 
 
 //Implementacion Arbol
