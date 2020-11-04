@@ -65,13 +65,16 @@ class BTREE
 				T* dataPtr; //Apuntador al dato
 				Node* right;
 				Node* left;
+			
 				
 		};
 
 	private:
 		Node* root; //Raiz del Arbol
 		void deleteAll(Node*&);
-	
+		void parsePreOrder(Node*&);
+		void parseInOrder(Node*&);
+		void parsePostOrder(Node*&);
 }
 
 ///Area Publica del arbol
@@ -199,4 +202,44 @@ void BTREE<T>::deleteAll(Node*& r)
 	delete r;
 
 	r = nullptr;
+}
+
+template<class T>
+void BTREE<T>::parsePreOrder(Node*& r)
+{
+	if (r == nullptr) {
+		return;
+	}
+
+	cout << r->getData() << ",";
+
+	parsePreOrder(r->getLeft());
+	parsePreOrder(r->getRight());
+}
+
+template<class T>
+void BTREE<T>::parseInOrder(Node *& r)
+{
+	if (r == nullptr) {
+		return;
+	}
+
+	parseInOrder(r->getLeft());
+
+	cout << r->getData() << ",";
+
+	parseInOrder(r->getRight());
+}
+
+template<class T>
+void BTREE<T>::parsePostOrder(Node*& r)
+{
+	if (r == nullptr) {
+		return;
+	}
+
+	parsePostOrder(r->getLeft());
+	parsePostOrder(r->getRight());
+
+	cout << r->getData() << ",";
 }
