@@ -76,6 +76,8 @@ class BTREE
 		void parseInOrder(Node*&);
 		void parsePostOrder(Node*&);
 		
+		int getBalanceFactor(Node*&);
+	
 		void simpleLeftRot(Node*&);
 		void simpleRightRot(Node*&);
 
@@ -262,6 +264,13 @@ void BTREE<T>::simpleLeftRot(Node*& r)
 	aux1->setLeft(r);
 	r = aux1;
 }
+	
+template<class T>
+int BTREE<T>::getBalanceFactor(Node*& r)
+{
+	return getHeight(r->getRight()) - getHeight(r->getLeft());
+}
+
 
 template<class T>
 void BTREE<T>::simpleRightRot(Node*& r)
