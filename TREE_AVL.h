@@ -12,6 +12,7 @@ class BTREE
 		BTREE();
 		BTREE(BTREE&);
 		~BTREE();
+		void deleteAll();
 	
 		class Exception : public std::exception {
 		private:
@@ -64,10 +65,12 @@ class BTREE
 				T* dataPtr; //Apuntador al dato
 				Node* right;
 				Node* left;
+				
 		};
 
 	private:
 		Node* root; //Raiz del Arbol
+		void deleteAll(Node*&);
 	
 }
 
@@ -171,4 +174,29 @@ template<class T>
 void BTREE<T>::insertData(const T & e)
 {
 	insertData(root, e);
+=======
+
+
+//Implementacion Arbol
+
+			///Area Privada
+template<class T>
+void BTREE<T>::deleteAll()			
+{
+	deleteAll(root);
+}
+
+template<class T>
+void BTREE<T>::deleteAll(Node*& r)
+{
+	if (r == nullptr) {
+		return;
+	}
+
+	deleteAll(r->getLeft());
+	deleteAll(r->getRight());
+
+	delete r;
+
+	r = nullptr;
 }
