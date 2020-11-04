@@ -75,6 +75,14 @@ class BTREE
 		void parsePreOrder(Node*&);
 		void parseInOrder(Node*&);
 		void parsePostOrder(Node*&);
+		
+		void simpleLeftRot(Node*&);
+		void simpleRightRot(Node*&);
+
+		void doubleLeftRot(Node*&);
+		void doubleRightRot(Node*&);
+
+		void doBalancing(Node*&);
 }
 
 ///Area Publica del arbol
@@ -243,3 +251,71 @@ void BTREE<T>::parsePostOrder(Node*& r)
 
 	cout << r->getData() << ",";
 }
+	
+template<class T>
+void BTREE<T>::simpleLeftRot(Node*& r)
+{
+	Node* aux1(r->getRight());
+	Node* aux2(aux1->getLeft());
+
+	r->setRight(aux2);
+	aux1->setLeft(r);
+	r = aux1;
+}
+
+template<class T>
+void BTREE<T>::simpleRightRot(Node*& r)
+{
+	Node* aux1(r->getLeft());
+	Node* aux2(aux1->getRight());
+
+	r->setLeft(aux2);
+	aux1->setRight(r);
+	r = aux1;
+}
+
+template<class T>
+void BTREE<T>::doubleLeftRot(Node*& r)
+{
+	simpleRightRot(r->getRight());
+	simpleLeftRot(r);
+}
+
+template<class T>
+void BTREE<T>::doubleRightRot(Node*& r)
+{
+	simpleLeftRot(r->getLeft());
+	simpleRightRot(r);
+}
+
+template<class T>
+void BTREE<T>::doBalancing(Node*& r)
+{
+	switch (getBalanceFactor(r))
+	{
+		case 2: //Aplicar Rotación a la izquierda
+			if (getBalanceFactor(r->getRight()) == 1) { //Signo coincide, rotación simple
+				//cout << "RSI: " << r->getData() << endl;
+				simpleLeftRot(r);
+			}
+
+			else { //Signo no coincide, rotación doble
+				//cout << "RDI: " << r->getData() << endl;
+				doubleLeftRot(r);
+			}
+			break;
+
+		case -2: //Aplicar Rotación a la derecha
+			if (getBalanceFactor(r->getLeft()) == -1) {	//Signo coincide, rotación simple
+				//cout << "RSD: " << r->getData() << endl;
+				simpleRightRot(r);
+			}
+
+			else { //Signo no coincide, rotación doble
+				//cout << "RDD: " << r->getData() << endl;
+				doubleRightRot(r);
+			}
+			break;
+	}
+}
+
