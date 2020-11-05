@@ -91,6 +91,7 @@ class BTREE
     public:
         Node*& findData(const T&);
         void deleteData(Node*&);
+	T& retrieve(Node*&);
 }
 
 ///Area Publica del arbol
@@ -308,6 +309,15 @@ void BTREE<T>::simpleLeftRot(Node*& r)
 	r->setRight(aux2);
 	aux1->setLeft(r);
 	r = aux1;
+}
+
+template<class T>
+T & BTREE<T>::retrieve(Node *& r)
+{
+	if (r == nullptr) {
+		throw Exception("Posicion invalida, retrieve");
+	}
+	return r->getData();
 }
 
 template<class T>
