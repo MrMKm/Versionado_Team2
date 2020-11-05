@@ -89,6 +89,7 @@ class BTREE
 		Node*& findData(Node*&, const T&);
 
     public:
+	bool isEmpty() const;
         Node*& findData(const T&);
         void deleteData(Node*&);
 	T& retrieve(Node*&);
@@ -102,6 +103,12 @@ template<class T>
 BTREE<T>::BTREE(BTREE & t) : root(nullptr)
 {
 	copyAll(t);
+}
+
+template<class T>
+bool BTREE<T>::isEmpty() const
+{
+	return root == nullptr;
 }
 
 template<class T>
