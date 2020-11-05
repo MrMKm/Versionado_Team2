@@ -90,6 +90,7 @@ class BTREE
 
     public:
 	bool isEmpty() const;
+	bool isLeaf(Node*&);
         Node*& findData(const T&);
         void deleteData(Node*&);
 	T& retrieve(Node*&);
@@ -357,6 +358,12 @@ void BTREE<T>::doubleRightRot(Node*& r)
 {
 	simpleLeftRot(r->getLeft());
 	simpleRightRot(r);
+}
+
+template<class T>
+bool BTREE<T>::isLeaf(Node*& r)
+{
+	return r!= nullptr && r->getLeft() == r->getRight();
 }
 
 template<class T>
