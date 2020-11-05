@@ -2,121 +2,119 @@
 #include <iostream>
 #include <exception>
 #include <string>
+//#include <utility>
 
 using namespace std;
 
 template<class T>
 class BTREE
 {
+public:
+	class Exception : public std::exception {
+	private:
+		std::string msg;
 	public:
-		BTREE();
-		BTREE(BTREE&);
-		~BTREE();
-		void deleteAll();
+		explicit Exception(const char* message) : msg(message) {}
 
-		class Exception : public std::exception {
+		explicit Exception(const std::string &message) : msg(message) { }
+
+		virtual ~Exception() throw () {}
+
+		virtual const char* what() const throw () {
+			return msg.c_str();
+		}
+	};
+
+	class Node
+	{
+	public:
+		class NodeException : public std::exception {
 		private:
 			std::string msg;
 		public:
-			explicit Exception(const char* message) : msg(message) {}
+			explicit NodeException(const char* message) : msg(message) {}
 
-			explicit Exception(const std::string &message) : msg(message) { }
+			explicit NodeException(const std::string &message) : msg(message) { }
 
-			virtual ~Exception() throw () {}
+			virtual ~NodeException() throw () {}
 
 			virtual const char* what() const throw () {
 				return msg.c_str();
 			}
 		};
 
-		class Node
-		{
-			public:
-				class NodeException : public std::exception {
-				private:
-					std::string msg;
-				public:
-					explicit NodeException(const char* message) : msg(message) {}
+		Node();
+		Node(const T&);
+		~Node();
 
-					explicit NodeException(const std::string &message) : msg(message) { }
+		T& getData();
+		T*& getDataPtr();
+		Node*& getRight();
+		Node*& getLeft();
 
-					virtual ~NodeException() throw () {}
-
-					virtual const char* what() const throw () {
-						return msg.c_str();
-					}
-				};
-
-				Node();
-				Node(const T&);
-				~Node();
-
-				T& getData();
-				T*& getDataPtr();
-				Node*& getRight();
-				Node*& getLeft();
-
-				void setDataPtr(Node*&);
-				void setData(const T&);
-				void setRight(Node*&);
-				void setLeft(Node*&);
-
-			private:
-				T* dataPtr; //Apuntador al dato
-				Node* right;
-				Node* left;
-
-
-		};
+		void setDataPtr(Node*&);
+		void setData(const T&);
+		void setRight(Node*&);
+		void setLeft(Node*&);
 
 	private:
-		Node* root; //Raiz del Arbol
-		void deleteAll(Node*&);
-		void parsePreOrder(Node*&);
-		void parseInOrder(Node*&);
-		void parsePostOrder(Node*&);
+		T* dataPtr; //Apuntador al dato
+		Node* right;
+		Node* left;
+	};
 
-		int getBalanceFactor(Node*&);
+private:
+	Node* root; //Raiz del Arbol
 
-		void simpleLeftRot(Node*&);
-		void simpleRightRot(Node*&);
+	void copyAll(Node*&, Node*&);
 
-		void doubleLeftRot(Node*&);
-		void doubleRightRot(Node*&);
+	void insertData(Node*&, const T&); //Inserta elemento en un sub arbol
+	Node*& findData(Node*&, const T&);
+	void deleteAll(Node*&);
+	int getHeight(Node*&);
 
-		void doBalancing(Node*&);
+	Node*& getTheLowest(Node*&);
+	Node*& getTheHighest(Node*&);
 
-		Node*& findData(Node*&, const T&);
+	void parsePreOrder(Node*&);
+	void parseInOrder(Node*&);
+	void parsePostOrder(Node*&);
 
-    public:
+	int getBalanceFactor(Node*&);
+
+	void simpleLeftRot(Node*&);
+	void simpleRightRot(Node*&);
+
+	void doubleLeftRot(Node*&);
+	void doubleRightRot(Node*&);
+
+	void doBalancing(Node*&);
+
+public:
+	BTREE();
+	BTREE(BTREE&);
+	~BTREE();
+
 	bool isEmpty() const;
 	bool isLeaf(Node*&);
-        Node*& findData(const T&);
-        void deleteData(Node*&);
+
+	void insertData(const T&);
+	void deleteData(Node*&);
+
+	Node*& findData(const T&);
+
 	T& retrieve(Node*&);
-}
 
-///Area Publica del arbol
-template<class T>
-BTREE<T>::BTREE() : root(nullptr) {}
+	void parsePreOrder();
+	void parseInOrder();
+	void parsePostOrder();
 
-template<class T>
-BTREE<T>::BTREE(BTREE & t) : root(nullptr)
-{
-	copyAll(t);
-}
+	void deleteAll();
 
-template<class T>
-bool BTREE<T>::isEmpty() const
-{
-	return root == nullptr;
-}
+	int getHeight();
 
-template<class T>
-BTREE<T>::~BTREE()
-{
-	deleteAll();
-}
+	BTREE& operator=(BTREE&);
+};
 
 ///Implementacion
 //Nodo
@@ -135,7 +133,7 @@ BTREE<T>::Node::~Node()
 {
 	delete dataPtr;
 }
-//Nodo getData
+
 template<class T>
 T& BTREE<T>::Node::getData()
 {
@@ -147,7 +145,19 @@ T*& BTREE<T>::Node::getDataPtr()
 {
 	return dataPtr;
 }
-//Nodo setData
+
+template<class T>
+typename BTREE<T>::Node*& BTREE<T>::Node::getRight()
+{
+	return right;
+}
+
+template<class T>
+typename BTREE<T>::Node*& BTREE<T>::Node::getLeft()
+{
+	return left;
+}
+
 template<class T>
 void BTREE<T>::Node::setDataPtr(Node*& p)
 {
@@ -167,8 +177,55 @@ void BTREE<T>::Node::setData(const T & e)
 		*dataPtr = e;
 	}
 }
-//area privada
-//insertar en el arbol m茅todo privado
+
+template<class T>
+void BTREE<T>::Node::setRight(Node*& p)
+{
+	right = p;
+}
+
+template<class T>
+void BTREE<T>::Node::setLeft(Node*& p)
+{
+	left = p;
+}
+
+//Implementacion Arbol
+
+			///Area Privada
+
+template<class T>
+void BTREE<T>::copyAll(Node*& from, Node*& to)
+{
+	if (from == nullptr) {
+		return;
+	}
+
+	try {
+		if ((to = new Node(from->getData())) == nullptr) {
+			throw Exception("MEMORIA NO DISPONIBLE, copyAll");
+			}
+		}
+	catch (typename Node::NodeException ex) {
+		throw Exception(ex.what());
+	}
+
+	copyAll(from->getLeft(), to->getLeft());
+	copyAll(from->getRight(), to->getRight());
+}
+
+template<class T>
+void BTREE<T>::deleteAll()			
+{
+	deleteAll(root);
+}
+
+template<class T>
+int BTREE<T>::getHeight()
+{
+	return getHeight(root);
+}
+
 template<class T>
 void BTREE<T>::insertData(Node*& r, const T & e)
 {
@@ -194,51 +251,19 @@ void BTREE<T>::insertData(Node*& r, const T & e)
 
 	//Saliendo de la recursividad
 
-	doBalancing(r); //Revisa factor de equilibro y aplica, rotaci贸n si es necesario
-}
-
-//area p煤blica
-//insertar en el arbol m茅todo p煤blico
-template<class T>
-void BTREE<T>::insertData(const T & e)
-{
-	insertData(root, e);
+	doBalancing(r); //Revisa factor de equilibro y aplica, rotaci髇 si es necesario
 }
 
 template<class T>
-typename BTREE<T>::Node*& BTREE<T>::findData(const T & e)
+typename BTREE<T>::Node*& BTREE<T>::findData(Node *& r, const T & e)
 {
-	return findData(root, e);
-}
-
-template<class T>
-void BTREE<T>::deleteData(Node *& r)
-{
-	if (r == nullptr) {
-		throw Exception("POSICION INVALIDA, deleteData");
+	if (r == nullptr || e == r->getData()) {
+		return r;
 	}
-
-	if (isLeaf(r)) {
-		delete r;
-		r = nullptr;
-		return;
+	if (e < r->getData()) {
+		return findData(r->getLeft(), e);
 	}
-
-	Node*& substitute(r->getLeft() != nullptr ? getTheHighest(r->getLeft()) : getTheLowest(r->getRight()));
-
-	swap(r->getDataPtr(), substitute->getDataPtr());
-
-	deleteData(substitute);
-}
-
-
-//Implementacion Arbol
-
-			///Area Privada
-template<class T>
-void BTREE<T>::deleteAll()
-{
-	deleteAll(root);
+	return findData(r->getRight(), e);
 }
 
 template<class T>
@@ -257,15 +282,44 @@ void BTREE<T>::deleteAll(Node*& r)
 }
 
 template<class T>
-typename BTREE<T>::Node*& BTREE<T>::findData(Node *& r, const T & e)
+int BTREE<T>::getHeight(Node *& r)
 {
-	if (r == nullptr || e == r->getData()) {
+	/*if(r == nullptr){
+	return 0;
+	}
+	int leftHight(getHeight(r->getLeft()));
+	int rightHeight(getHeight(r->getRight()));
+
+	if(leftHight > rightHeight){
+	return leftHight + 1;
+	}
+	return rightHeight + 1;*/
+
+	if (r == nullptr) {
+		return 0;
+	}
+	int leftHight(getHeight(r->getLeft()));
+	int rightHeight(getHeight(r->getRight()));
+
+	return 1 + (leftHight > rightHeight ? leftHight : rightHeight);
+}
+
+template<class T>
+typename BTREE<T>::Node*& BTREE<T>::getTheLowest(Node *& r)
+{
+	if (r == nullptr || r->getLeft() == nullptr) {
 		return r;
 	}
-	if (e < r->getData()) {
-		return findData(r->getLeft(), e);
+	return getTheLowest(r->getLeft());
+}
+
+template<class T>
+typename BTREE<T>::Node*& BTREE<T>::getTheHighest(Node*& r)
+{
+	if (r == nullptr || r->getRight() == nullptr) {
+		return r;
 	}
-	return findData(r->getRight(), e);
+	return getTheHighest(r->getRight());
 }
 
 template<class T>
@@ -308,6 +362,14 @@ void BTREE<T>::parsePostOrder(Node*& r)
 	cout << r->getData() << ",";
 }
 
+///Balancing Methods
+
+template<class T>
+int BTREE<T>::getBalanceFactor(Node*& r)
+{
+	return getHeight(r->getRight()) - getHeight(r->getLeft());
+}
+
 template<class T>
 void BTREE<T>::simpleLeftRot(Node*& r)
 {
@@ -318,22 +380,6 @@ void BTREE<T>::simpleLeftRot(Node*& r)
 	aux1->setLeft(r);
 	r = aux1;
 }
-
-template<class T>
-T & BTREE<T>::retrieve(Node *& r)
-{
-	if (r == nullptr) {
-		throw Exception("Posicion invalida, retrieve");
-	}
-	return r->getData();
-}
-
-template<class T>
-int BTREE<T>::getBalanceFactor(Node*& r)
-{
-	return getHeight(r->getRight()) - getHeight(r->getLeft());
-}
-
 
 template<class T>
 void BTREE<T>::simpleRightRot(Node*& r)
@@ -361,39 +407,130 @@ void BTREE<T>::doubleRightRot(Node*& r)
 }
 
 template<class T>
+void BTREE<T>::doBalancing(Node*& r)
+{
+	switch (getBalanceFactor(r))
+	{
+		case 2: //Aplicar Rotaci髇 a la izquierda
+			if (getBalanceFactor(r->getRight()) == 1) { //Signo coincide, rotaci髇 simple
+				//cout << "RSI: " << r->getData() << endl;
+				simpleLeftRot(r);
+			}
+
+			else { //Signo no coincide, rotaci髇 doble
+				//cout << "RDI: " << r->getData() << endl;
+				doubleLeftRot(r);
+			}
+			break;
+
+		case -2: //Aplicar Rotaci髇 a la derecha
+			if (getBalanceFactor(r->getLeft()) == -1) {	//Signo coincide, rotaci髇 simple
+				//cout << "RSD: " << r->getData() << endl;
+				simpleRightRot(r);
+			}
+
+			else { //Signo no coincide, rotaci髇 doble
+				//cout << "RDD: " << r->getData() << endl;
+				doubleRightRot(r);
+			}
+			break;
+	}
+}
+
+				///Area Publica
+
+template<class T>
+BTREE<T>::BTREE() : root(nullptr) {}
+
+template<class T>
+BTREE<T>::BTREE(BTREE & t) : root(nullptr)
+{
+	copyAll(t);
+}
+
+template<class T>
+BTREE<T>::~BTREE()
+{
+	deleteAll();
+}
+
+template<class T>
+bool BTREE<T>::isEmpty() const
+{
+	return root == nullptr;
+}
+
+template<class T>
 bool BTREE<T>::isLeaf(Node*& r)
 {
 	return r!= nullptr && r->getLeft() == r->getRight();
 }
 
 template<class T>
-void BTREE<T>::doBalancing(Node*& r)
+void BTREE<T>::insertData(const T & e)
 {
-	switch (getBalanceFactor(r))
-	{
-		case 2: //Aplicar Rotaci贸n a la izquierda
-			if (getBalanceFactor(r->getRight()) == 1) { //Signo coincide, rotaci贸n simple
-				//cout << "RSI: " << r->getData() << endl;
-				simpleLeftRot(r);
-			}
+	insertData(root, e);
+}
 
-			else { //Signo no coincide, rotaci贸n doble
-				//cout << "RDI: " << r->getData() << endl;
-				doubleLeftRot(r);
-			}
-			break;
-
-		case -2: //Aplicar Rotaci贸n a la derecha
-			if (getBalanceFactor(r->getLeft()) == -1) {	//Signo coincide, rotaci贸n simple
-				//cout << "RSD: " << r->getData() << endl;
-				simpleRightRot(r);
-			}
-
-			else { //Signo no coincide, rotaci贸n doble
-				//cout << "RDD: " << r->getData() << endl;
-				doubleRightRot(r);
-			}
-			break;
+template<class T>
+void BTREE<T>::deleteData(Node *& r)
+{
+	if (r == nullptr) {
+		throw Exception("POSICION INVALIDA, deleteData");
 	}
+
+	if (isLeaf(r)) {
+		delete r;
+		r = nullptr;
+		return;
+	}
+
+	Node*& substitute(r->getLeft() != nullptr ? getTheHighest(r->getLeft()) : getTheLowest(r->getRight()));
+
+	swap(r->getDataPtr(), substitute->getDataPtr());
+
+	deleteData(substitute);
+}
+
+template<class T>
+typename BTREE<T>::Node*& BTREE<T>::findData(const T & e)
+{
+	return findData(root, e);
+}
+
+template<class T>
+T & BTREE<T>::retrieve(Node *& r)
+{
+	if (r == nullptr) {
+		throw Exception("Posicion invalida, retrieve");
+	}
+	return r->getData();
+}
+
+template<class T>
+void BTREE<T>::parsePreOrder()
+{
+	parsePreOrder(root);
+}
+
+template<class T>
+void BTREE<T>::parseInOrder()
+{
+	parseInOrder(root);
+}
+
+template<class T>
+void BTREE<T>::parsePostOrder()
+{
+	parsePostOrder(root);
+}
+
+template<class T>
+BTREE<T>& BTREE<T>::operator=(BTREE & t)
+{
+	deleteAll();
+	copyAll(t.root, root);
+
+	return *this;
 }
 
