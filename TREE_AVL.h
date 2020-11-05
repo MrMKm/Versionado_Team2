@@ -13,7 +13,7 @@ class BTREE
 		BTREE(BTREE&);
 		~BTREE();
 		void deleteAll();
-
+	
 		class Exception : public std::exception {
 		private:
 			std::string msg;
@@ -28,7 +28,7 @@ class BTREE
 				return msg.c_str();
 			}
 		};
-
+		
 		class Node
 		{
 			public:
@@ -65,8 +65,8 @@ class BTREE
 				T* dataPtr; //Apuntador al dato
 				Node* right;
 				Node* left;
-
-
+			
+				
 		};
 
 	private:
@@ -75,9 +75,9 @@ class BTREE
 		void parsePreOrder(Node*&);
 		void parseInOrder(Node*&);
 		void parsePostOrder(Node*&);
-
+		
 		int getBalanceFactor(Node*&);
-
+	
 		void simpleLeftRot(Node*&);
 		void simpleRightRot(Node*&);
 
@@ -85,11 +85,6 @@ class BTREE
 		void doubleRightRot(Node*&);
 
 		void doBalancing(Node*&);
-
-		Node*& findData(Node*&, const T&);
-
-    public:
-        Node*& findData(const T&);
 }
 
 ///Area Publica del arbol
@@ -186,26 +181,20 @@ void BTREE<T>::insertData(Node*& r, const T & e)
 
 	doBalancing(r); //Revisa factor de equilibro y aplica, rotación si es necesario
 }
-
 //area pública
 //insertar en el arbol método público
 template<class T>
 void BTREE<T>::insertData(const T & e)
 {
 	insertData(root, e);
-}
+=======
 
-template<class T>
-typename BTREE<T>::Node*& BTREE<T>::findData(const T & e)
-{
-	return findData(root, e);
-}
 
 //Implementacion Arbol
 
 			///Area Privada
 template<class T>
-void BTREE<T>::deleteAll()
+void BTREE<T>::deleteAll()			
 {
 	deleteAll(root);
 }
@@ -223,18 +212,6 @@ void BTREE<T>::deleteAll(Node*& r)
 	delete r;
 
 	r = nullptr;
-}
-
-template<class T>
-typename BTREE<T>::Node*& BTREE<T>::findData(Node *& r, const T & e)
-{
-	if (r == nullptr || e == r->getData()) {
-		return r;
-	}
-	if (e < r->getData()) {
-		return findData(r->getLeft(), e);
-	}
-	return findData(r->getRight(), e);
 }
 
 template<class T>
@@ -276,7 +253,7 @@ void BTREE<T>::parsePostOrder(Node*& r)
 
 	cout << r->getData() << ",";
 }
-
+	
 template<class T>
 void BTREE<T>::simpleLeftRot(Node*& r)
 {
@@ -287,7 +264,7 @@ void BTREE<T>::simpleLeftRot(Node*& r)
 	aux1->setLeft(r);
 	r = aux1;
 }
-
+	
 template<class T>
 int BTREE<T>::getBalanceFactor(Node*& r)
 {
