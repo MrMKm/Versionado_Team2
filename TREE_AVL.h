@@ -90,6 +90,7 @@ class BTREE
 
     public:
         Node*& findData(const T&);
+        void deleteData(Node*&);
 }
 
 ///Area Publica del arbol
@@ -200,6 +201,27 @@ typename BTREE<T>::Node*& BTREE<T>::findData(const T & e)
 {
 	return findData(root, e);
 }
+
+template<class T>
+void BTREE<T>::deleteData(Node *& r)
+{
+	if (r == nullptr) {
+		throw Exception("POSICION INVALIDA, deleteData");
+	}
+
+	if (isLeaf(r)) {
+		delete r;
+		r = nullptr;
+		return;
+	}
+
+	Node*& substitute(r->getLeft() != nullptr ? getTheHighest(r->getLeft()) : getTheLowest(r->getRight()));
+
+	swap(r->getDataPtr(), substitute->getDataPtr());
+
+	deleteData(substitute);
+}
+
 
 //Implementacion Arbol
 
